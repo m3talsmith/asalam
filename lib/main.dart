@@ -1,43 +1,64 @@
-import 'package:asalam/home/home.dart';
+import 'package:asalam/data/location.dart';
+import 'package:asalam/data/prayer_times.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Location.loadPosition();
   runApp(const App());
 }
 
-class App extends StatefulWidget {
+class App extends StatelessWidget {
   const App({super.key});
 
   @override
-  State<StatefulWidget> createState() => _AppState();
-}
-
-class _AppState extends State<App> {
-  final List<Widget> _pages = [const HomePage()];
-  int _currentPageIndex = 0;
-
-  @override
   Widget build(BuildContext context) {
+    final prayerToday = PrayerToday();
+    final prayerTimeFormatter = DateFormat('h:mm', );
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(colorSchemeSeed: Colors.green, useMaterial3: true),
+      theme: ThemeData(
+        colorSchemeSeed: Colors.green,
+        useMaterial3: true,
+      ),
       title: 'Asalam',
       home: Scaffold(
-        body: _pages[_currentPageIndex],
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            height: 60,
-            decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: const BorderRadius.all(Radius.circular(10))),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(onPressed: (){}, icon: Icon(Icons.home_rounded, color: Theme.of(context).canvasColor, size: 30,))
-              ],
+        body: ListView(
+          children: [
+            ListTile(
+              title: const Text('Position'),
+              subtitle: Text(Location.position?.toString() ?? 'Unset'),
+              trailing: const IconButton(
+                  onPressed: Location.resetPosition,
+                  icon: Icon(Icons.location_searching_rounded)),
             ),
-          ),
+            ListTile(
+              title: const Text('Fajr'),
+              subtitle: Text(prayerTimeFormatter.format(prayerToday.fajr)),
+            ),
+            ListTile(
+              title: const Text('Sunrise'),
+              subtitle: Text(prayerTimeFormatter.format(prayerToday.sunrise)),
+            ),
+            ListTile(
+              title: const Text('Dhuhr'),
+              subtitle: Text(prayerTimeFormatter.format(prayerToday.dhuhr)),
+            ),
+            ListTile(
+              title: const Text('Asr'),
+              subtitle: Text(prayerTimeFormatter.format(prayerToday.asr)),
+            ),
+            ListTile(
+              title: const Text('Maghrib'),
+              subtitle: Text(prayerTimeFormatter.format(prayerToday.maghrib)),
+            ),
+            ListTile(
+              title: const Text('Isha'),
+              subtitle: Text(prayerTimeFormatter.format(prayerToday.isha)),
+            ),
+          ],
         ),
       ),
     );
